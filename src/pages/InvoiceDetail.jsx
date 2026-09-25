@@ -91,19 +91,48 @@ export default function InvoiceDetail() {
       )}
 
       {/* Financing */}
-      {financing.length > 0 && (
-        <div className="card" style={{ marginBottom: '1.25rem' }}>
-          <div className="financing-label">🏦 Financing Status <span className="sim">Simulated</span></div>
-          {financing.map(f => (
+      <div className="card" style={{ marginBottom: '1.25rem' }}>
+        <div className="financing-label">
+          <span>🏦 Simulated TReDS / Financing Flow</span>
+          <span className="sim">Demonstration Only</span>
+        </div>
+        <p style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginBottom: '0.75rem' }}>
+          Simulated institutional invoice discounting. Not connected to RBI or live TReDS exchanges.
+        </p>
+
+        {financing && financing.length > 0 ? (
+          financing.map(f => (
             <div key={f.id} className="financing-card">
               <div className="financier">{f.financier}</div>
               <div className="detail-row"><span className="lbl">Status</span><span className={`badge badge-${f.status === 'ELIGIBLE' ? 'issued' : 'paid'}`}>{f.status}</span></div>
-              <div className="detail-row"><span className="lbl">Discount Rate</span><span className="rate">{f.discount_rate}%</span></div>
-              <div className="detail-row"><span className="lbl">Settlement</span><span>{fmt(f.settlement_amount)}</span></div>
+              <div className="detail-row"><span className="lbl">Discount Rate</span><span className="rate">{f.discount_rate}% APR</span></div>
+              <div className="detail-row"><span className="lbl">Settlement Amount</span><span>{fmt(f.settlement_amount)}</span></div>
             </div>
-          ))}
-        </div>
-      )}
+          ))
+        ) : inv.status !== 'PAID' && inv.status !== 'DISPUTED' ? (
+          <div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem', marginTop: '0.5rem' }}>
+              <div className="financing-card">
+                <div className="financier">Financier A (SBI Global Factors)</div>
+                <div className="rate">10.4% APR</div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Est. Settlement: {fmt(inv.amount * 0.896)}</div>
+              </div>
+              <div className="financing-card">
+                <div className="financier">Financier B (Canbank Factors)</div>
+                <div className="rate">10.8% APR</div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Est. Settlement: {fmt(inv.amount * 0.892)}</div>
+              </div>
+              <div className="financing-card">
+                <div className="financier">Financier C (India Factoring)</div>
+                <div className="rate">11.1% APR</div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Est. Settlement: {fmt(inv.amount * 0.889)}</div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>Financing not active for this invoice status.</p>
+        )}
+      </div>
 
       {/* Event Timeline */}
       <div className="card">

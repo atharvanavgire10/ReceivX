@@ -119,7 +119,32 @@ def get_events(db, invoice_id=None, limit=50):
 
 
 def get_financing(db, invoice_id):
+    invoice = db.query(Invoice).filter(Invoice.id == invoice_id).first()
     rows = db.query(FinancingRequest).filter(
         FinancingRequest.invoice_id == invoice_id
     ).all()
-    return [f.to_dict() for f in rows]
+    existing = [f.to_dict() for f in rows]
+
+    quotes = []
+    if invoice and invoice.status not in ["PAID", "DISPUTED", "DRAFT"]:
+        # Synthetic bids from three institutional TReDS participants
+        rates = [
+            {"financier": "Financier A (SBI Global Factors)", "discount_rate": 10.4},
+            {"financier": "Financier B (Canbank Factors)", "discount_rate": 10.8},
+            {"financier": "Financier C (India Factoring)", "discount_rate": 11.1},
+        ]
+        for r in rates:
+            settlement = round(invoice.amount * (1 - (r["discount_rate"] / 100)), 2)
+            quotes.append({
+                "financier": r["financier"],
+                "discount_rate": r["discount_rate"],
+                "settlement_amount": settlement,
+                "disclaimer": "Demonstration value only — Simulated TReDS Quote"
+            })
+
+    return {
+        "requests": existing,
+        "quotes": quotes,
+        "is_eligible": invoice is not None and invoice.status in ["ACCEPTED", "ISSUED", "OVERDUE"],
+        "disclaimer": "Simulated TReDS / Financing Flow — Not connected to RBI or production systems"
+    }
