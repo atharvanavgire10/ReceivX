@@ -46,10 +46,10 @@ def get_invoices(db):
 
 
 def get_invoice_detail(db, invoice_id):
-    inv = db.query(Invoice).get(invoice_id)
+    inv = db.get(Invoice, invoice_id)
     if not inv:
         return None
-    buyer = db.query(Buyer).get(inv.buyer_id)
+    buyer = db.get(Buyer, inv.buyer_id)
     events = db.query(InvoiceEvent).filter(
         InvoiceEvent.invoice_id == invoice_id
     ).order_by(InvoiceEvent.created_at.desc()).all()
@@ -93,7 +93,7 @@ def get_buyers(db):
 
 
 def get_buyer_detail(db, buyer_id):
-    buyer = db.query(Buyer).get(buyer_id)
+    buyer = db.get(Buyer, buyer_id)
     if not buyer:
         return None
     invoices = db.query(Invoice).filter(Invoice.buyer_id == buyer_id).order_by(Invoice.due_at.desc()).all()

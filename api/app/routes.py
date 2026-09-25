@@ -14,6 +14,21 @@ def err(message, status=400):
     return jsonify({"success": False, "error": message}), status
 
 
+@api.errorhandler(400)
+def handle_bad_request(e):
+    return jsonify({"success": False, "error": "Bad request"}), 400
+
+
+@api.errorhandler(404)
+def handle_not_found(e):
+    return jsonify({"success": False, "error": "Resource not found"}), 404
+
+
+@api.errorhandler(500)
+def handle_server_error(e):
+    return jsonify({"success": False, "error": "Internal server error"}), 500
+
+
 @api.route("/health")
 def health():
     try:
