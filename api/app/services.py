@@ -57,9 +57,15 @@ def get_invoice_detail(db, invoice_id):
     financing = db.query(FinancingRequest).filter(
         FinancingRequest.invoice_id == invoice_id
     ).all()
+    from .rules import calculate_risk
+    reasons = []
+    if inv and buyer:
+        _, _, reasons = calculate_risk(inv, buyer, db)
+
     return {
         "invoice": inv.to_dict(),
         "buyer": buyer.to_dict() if buyer else None,
+        "risk_reasons": reasons,
         "events": [e.to_dict() for e in events],
         "payments": [p.to_dict() for p in payments],
         "financing": [f.to_dict() for f in financing],

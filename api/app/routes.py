@@ -102,3 +102,73 @@ def financing(invoice_id):
         return ok(services.get_financing(db, invoice_id))
     finally:
         db.close()
+
+
+# -------------------------------------------------------------
+# Simulation endpoints
+# -------------------------------------------------------------
+from . import simulation
+from flask import request
+
+
+@api.route("/simulation/run", methods=["POST"])
+def sim_run():
+    db = next(get_db())
+    try:
+        data = simulation.run_full_demo(db)
+        return ok(data)
+    finally:
+        db.close()
+
+
+@api.route("/simulation/payment-delay", methods=["POST"])
+def sim_payment_delay():
+    db = next(get_db())
+    try:
+        payload = request.get_json(silent=True) or {}
+        inv_id = payload.get("invoice_id")
+        data, error = simulation.simulate_payment_delay(db, invoice_id=inv_id)
+        if error:
+            return err(error, 400)
+        return ok(data)
+    finally:
+        db.close()
+
+
+@api.route("/simulation/payment", methods=["POST"])
+def sim_payment():
+    db = next(get_db())
+    try:
+        payload = request.get_json(silent=True) or {}
+        inv_id = payload.get("invoice_id")
+        data, error = simulation.simulate_payment(db, invoice_id=inv_id)
+        if error:
+            return err(error, 400)
+        return ok(data)
+    finally:
+        db.close()
+
+
+@api.route("/simulation/financing", methods=["POST"])
+def sim_financing():
+    db = next(get_db())
+    try:
+        payload = request.get_json(silent=True) or {}
+        inv_id = payload.get("invoice_id")
+        data, error = simulation.simulate_financing(db, invoice_id=inv_id)
+        if error:
+            return err(error, 400)
+        return ok(data)
+    finally:
+        db.close()
+
+
+@api.route("/simulation/reset", methods=["POST"])
+def sim_reset():
+    db = next(get_db())
+    try:
+        data = simulation.reset_simulation(db)
+        return ok(data)
+    finally:
+        db.close()
+

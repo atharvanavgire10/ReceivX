@@ -56,13 +56,17 @@ export default function InvoiceDetail() {
         </div>
       </div>
 
-      {/* Risk Reasons placeholder */}
-      {inv.risk_score > 0 && (
+      {/* Risk Reasons */}
+      {data.risk_reasons && data.risk_reasons.length > 0 && (
         <div className="card" style={{ marginBottom: '1.25rem' }}>
-          <h2 style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: '0.75rem' }}>⚠ Risk Analysis</h2>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            Risk score: {inv.risk_score} ({inv.risk_level}). Detailed risk reasons available in Phase 2.
-          </p>
+          <h2 style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: '0.75rem' }}>
+            ⚠ Risk Analysis ({inv.risk_score}/100 — {inv.risk_level})
+          </h2>
+          <ul className="risk-reasons">
+            {data.risk_reasons.map((r, i) => (
+              <li key={i}>{r}</li>
+            ))}
+          </ul>
         </div>
       )}
 

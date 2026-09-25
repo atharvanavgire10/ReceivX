@@ -24,7 +24,8 @@ def calculate_risk(invoice, buyer, db):
     from datetime import datetime, timezone
     now = datetime.now(timezone.utc)
     if invoice.due_at:
-        days_remaining = (invoice.due_at - now).days
+        due = invoice.due_at if invoice.due_at.tzinfo else invoice.due_at.replace(tzinfo=timezone.utc)
+        days_remaining = (due - now).days
         if days_remaining < 0:
             score += 25
             reasons.append(f"Invoice is {abs(days_remaining)} days overdue")
